@@ -12,7 +12,7 @@ https://redis.io/topics/streams-intro
 
 ## All Redis Commands
 
-https://redis.io/commands#hash
+https://redis.io/commands
 
 
 ## Lettuce- Java Client for Redis
