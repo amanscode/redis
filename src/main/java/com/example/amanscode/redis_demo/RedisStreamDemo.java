@@ -20,7 +20,7 @@ import io.lettuce.core.api.sync.RedisCommands;
 public class RedisStreamDemo {
 
 	public static void main(String[] args) {
-		RedisURI redisURI = RedisURI.create("redis://10.32.141.15:6002");
+		RedisURI redisURI = RedisURI.create("redis://127.0.0.1:6379");
 		RedisClient redisClient = RedisClient.create(redisURI);
 		StatefulRedisConnection<String, String> connection = redisClient.connect();
 		RedisCommands<String, String> syncCommands = connection.sync();
@@ -48,15 +48,15 @@ public class RedisStreamDemo {
 //		
 //		RedisStreamDemo.readXRange(syncCommands, streamName, "-", "+");
 		
-//		StreamOffset<String> streamOffsetConsumer = StreamOffset.from(streamName, "0-0");
-//		String cgroup1 = "cgroup1";
-//		System.out.println("- Creating cosumer group consumer1 : " + syncCommands.xgroupCreate(streamOffsetConsumer, cgroup1));
-//		String cgroup2 = "cgroup2";
-//		System.out.println("- Creating cosumer group consumer1 : " + syncCommands.xgroupCreate(streamOffsetConsumer, cgroup2));
-//		Consumer<String> Ram = Consumer.from(cgroup1, "Ram");
-//		Consumer<String> Shiv = Consumer.from(cgroup1, "Shiv");
-//		Consumer<String> Rahul = Consumer.from(cgroup1, "Rahul");
-//		RedisStreamDemo.readXGroup(syncCommands, streamName, Ram, ">");
+		StreamOffset<String> streamOffsetConsumer = StreamOffset.from(streamName, "0-0");
+		String cgroup1 = "cgroup1";
+		System.out.println("- Creating consumer group consumer1 : " + syncCommands.xgroupCreate(streamOffsetConsumer, cgroup1));
+		String cgroup2 = "cgroup2";
+		System.out.println("- Creating consumer group consumer1 : " + syncCommands.xgroupCreate(streamOffsetConsumer, cgroup2));
+		Consumer<String> Ram = Consumer.from(cgroup1, "Ram");
+		Consumer<String> Shiv = Consumer.from(cgroup1, "Shiv");
+		Consumer<String> Rahul = Consumer.from(cgroup1, "Rahul");
+		RedisStreamDemo.readXGroup(syncCommands, streamName, Ram, ">");
 //		
 //		data = new HashMap<String, String>();
 //		data.put("Key3", "Value3");
@@ -217,36 +217,36 @@ public class RedisStreamDemo {
         }
 	}
 	
-	public static void pendingMessages(RedisCommands<String, String> syncCommands, String streamName, String consumerGroupName, String start, String end, Long limit) {
-		System.out.println(); System.out.println("XPENDING **********************"); System.out.println();
-		List pendingList = syncCommands.xpending(streamName, consumerGroupName);
-		System.out.println(pendingList);
-		List<Object> pendingListDetailed = syncCommands.xpending(streamName, consumerGroupName, Range.create(start, end), Limit.from(limit));
-		System.out.println(pendingListDetailed);
-		for(int i = 0; i < pendingListDetailed.size(); i++)
-		{
-			List n = (List)pendingListDetailed.get(i);
-			System.out.println("Pending Message " + i + " : " + n);
-		}
-	}
+//	public static void pendingMessages(RedisCommands<String, String> syncCommands, String streamName, String consumerGroupName, String start, String end, Long limit) {
+//		System.out.println(); System.out.println("XPENDING **********************"); System.out.println();
+//		List pendingList = syncCommands.xpending(streamName, consumerGroupName);
+//		System.out.println(pendingList);
+//		List<Object> pendingListDetailed = syncCommands.xpending(streamName, consumerGroupName, Range.create(start, end), Limit.from(limit));
+//		System.out.println(pendingListDetailed);
+//		for(int i = 0; i < pendingListDetailed.size(); i++)
+//		{
+//			List n = (List)pendingListDetailed.get(i);
+//			System.out.println("Pending Message " + i + " : " + n);
+//		}
+//	}
 	
-	public static void claimMessages(RedisCommands<String, String> syncCommands, String streamName, String consumerGroupName, Consumer consumer, Long idleTime, String messageID) {
-		System.out.println(); System.out.println("Claiming message for " + consumer.getName() + " with ID " + messageID + " **********************"); System.out.println();
-		List pendingList = syncCommands.xpending(streamName, consumerGroupName);
-		System.out.println(pendingList);
-		List<StreamMessage<String, String>> xclaimgroup = syncCommands.xclaim(streamName, consumer, idleTime, messageID);
-		int listSize = xclaimgroup.size(); System.out.println("xclaimgroup listSize : " + listSize);
-		for (int i = 0; i < listSize; i++) {
-            StreamMessage<String, String> streamMessage = xclaimgroup.get(i);
-            String _streamName = streamMessage.getStream();
-            String _streamID = streamMessage.getId();
-            System.out.println(_streamName + " : " + _streamID);
-            Map<String, String> _data = streamMessage.getBody();
-            for(Map.Entry<String, String> entry : _data.entrySet()) {
-            	System.out.println("Field: " + entry.getKey() + ", Value: " + entry.getValue());
-            }
-        }
-	}
+//	public static void claimMessages(RedisCommands<String, String> syncCommands, String streamName, String consumerGroupName, Consumer consumer, Long idleTime, String messageID) {
+//		System.out.println(); System.out.println("Claiming message for " + consumer.getName() + " with ID " + messageID + " **********************"); System.out.println();
+//		List pendingList = syncCommands.xpending(streamName, consumerGroupName);
+//		System.out.println(pendingList);
+//		List<StreamMessage<String, String>> xclaimgroup = syncCommands.xclaim(streamName, consumer, idleTime, messageID);
+//		int listSize = xclaimgroup.size(); System.out.println("xclaimgroup listSize : " + listSize);
+//		for (int i = 0; i < listSize; i++) {
+//            StreamMessage<String, String> streamMessage = xclaimgroup.get(i);
+//            String _streamName = streamMessage.getStream();
+//            String _streamID = streamMessage.getId();
+//            System.out.println(_streamName + " : " + _streamID);
+//            Map<String, String> _data = streamMessage.getBody();
+//            for(Map.Entry<String, String> entry : _data.entrySet()) {
+//            	System.out.println("Field: " + entry.getKey() + ", Value: " + entry.getValue());
+//            }
+//        }
+//	}
 
 	public static Map<Object, Object> infoStream(RedisCommands<String, String> syncCommands, String streamName) {
 		List<Object> list = null;

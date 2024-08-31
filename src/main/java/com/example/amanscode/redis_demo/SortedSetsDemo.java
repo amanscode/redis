@@ -15,7 +15,7 @@ import io.lettuce.core.api.sync.RedisCommands;
 public class SortedSetsDemo {
 	public static RedisCommands<String, String> syncCommands;
 	public static void main(String[] args) {
-		RedisURI redisURI = RedisURI.create("redis://10.32.141.15:6002");
+		RedisURI redisURI = RedisURI.create("redis://127.0.0.1:6379");
 		RedisClient redisClient = RedisClient.create(redisURI);
 		StatefulRedisConnection<String, String> connection = redisClient.connect();
 		RedisCommands<String, String> syncCommandss = connection.sync();
